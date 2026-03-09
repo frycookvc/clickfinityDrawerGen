@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ClickFinity Baseplate Generator</title>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #1a1a2e; color: #e0e0e0; min-height: 100vh; }
+.container { max-width: 1200px; margin: 0 auto; padding: 20px; }
+h1 { text-align: center; color: #00d4ff; margin-bottom: 6px; font-size: 1.8em; }
+.subtitle { text-align: center; color: #888; margin-bottom: 24px; font-size: 0.9em; }
+.main-grid { display: grid; grid-template-columns: 340px 1fr; gap: 24px; }
+@media (max-width: 900px) { .main-grid { grid-template-columns: 1fr; } }
+.panel { background: #16213e; border-radius: 12px; padding: 20px; border: 1px solid #0f3460; }
+.panel h2 { color: #00d4ff; font-size: 1.1em; margin-bottom: 16px; border-bottom: 1px solid #0f3460; padding-bottom: 8px; }
+.form-group { margin-bottom: 14px; }
+.form-group label { display: block; font-size: 0.85em; color: #aaa; margin-bottom: 4px; }
+.form-group input, .form-group select { width: 100%; padding: 8px 12px; border-radius: 6px; border: 1px solid #0f3460; background: #0d1b3e; color: #e0e0e0; font-size: 0.95em; }
+.form-group input:focus, .form-group select:focus { outline: none; border-color: #00d4ff; }
+.form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.btn { display: block; width: 100%; padding: 12px; border: none; border-radius: 8px; font-size: 1em; font-weight: 600; cursor: pointer; transition: all 0.2s; }
+.btn-primary { background: linear-gradient(135deg, #00d4ff, #0080ff); color: #fff; }
+.btn-primary:hover { transform: translateY(-1px); box-shadow: 0 4px 15px rgba(0,212,255,0.3); }
+.btn-primary:disabled { opacity: 0.5; cursor: not-allowed; transform: none; box-shadow: none; }
+.btn-download { background: linear-gradient(135deg, #00cc88, #00aa66); color: #fff; margin-top: 12px; }
+.btn-download:hover { box-shadow: 0 4px 15px rgba(0,204,136,0.3); }
+.btn-download:disabled { opacity: 0.5; cursor: not-allowed; }
+.stats { margin-top: 16px; }
+.stat-row { display: flex; justify-content: space-between; padding: 6px 0; border-bottom: 1px solid #0f3460; font-size: 0.9em; }
+.stat-row .label { color: #888; }
+.stat-row .value { color: #00d4ff; font-weight: 600; }
+.status-text { margin-top: 10px; font-size: 0.85em; color: #888; min-height: 20px; }
+#preview-container { width: 100%; height: 500px; border-radius: 8px; overflow: hidden; background: #0d1b3e; position: relative; }
+.preview-hint { position: absolute; bottom: 10px; left: 10px; font-size: 0.75em; color: #555; pointer-events: none; }
+.slicer-table { margin-top: 16px; width: 100%; border-collapse: collapse; font-size: 0.82em; }
+.slicer-table th, .slicer-table td { padding: 5px 8px; text-align: left; border-bottom: 1px solid #0f3460; }
+.slicer-table th { color: #00d4ff; }
+.slicer-table td:first-child { color: #aaa; }
+.panel-list { margin-top: 12px; font-size: 0.85em; }
+.panel-item { padding: 4px 0; color: #ccc; }
+.warning { color: #ffaa00; font-size: 0.85em; margin-top: 8px; }
+</style>
+</head>
+<body>
+<div class="container">
+<h1>ClickFinity Baseplate Generator</h1>
+<p class="subtitle">Generate custom Gridfinity-compatible baseplates for any drawer size</p>
+
+<div class="main-grid">
+<div class="left-col">
+  <div class="panel">
+    <h2>Drawer Dimensions</h2>
+    <div class="form-row">
+      <div class="form-group">
+        <label>Width (mm)</label>
+        <input type="number" id="inp-width" value="554" min="55" max="2000" step="1">
+      </div>
+      <div class="form-group">
+        <label>Depth (mm)</label>
+        <input type="number" id="inp-depth" value="480" min="55" max="2000" step="1">
+      </div>
+    </div>
+    <div class="form-group">
+      <label>Edge Alignment</label>
+      <select id="inp-align">
+        <option value="centered" selected>Centered</option>
+        <option value="top-left">Top-Left</option>
+        <option value="bottom-right">Bottom-Right</option>
+      </select>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label>Edge Fill Thickness (mm)</label>
+        <input type="number" id="inp-thickness" value="4.0" min="1.0" max="6.0" step="0.5">
+      </div>
+      <div class="form-group">
+        <label>Joiner Nub Offset (mm)</label>
+        <input type="number" id="inp-offset" value="0.2" min="-0.5" max="0.5" step="0.05">
+      </div>
+    </div>
+    <button class="btn btn-primary" id="btn-generate" onclick="generate()">Generate Baseplates</button>
+    <div class="status-text" id="status"></div>
+  </div>
+
+  <div class="panel stats" id="stats-panel" style="display:none;">
+    <h2>Summary</h2>
+    <div id="stats-content"></div>
+    <button class="btn btn-download" id="btn-download" onclick="downloadZip()" disabled>Download ZIP (STL)</button>
+    <button class="btn btn-download" id="btn-download-3mf" onclick="download3MF()" disabled>Download 3MF (BambuStudio)</button>
+  </div>
+
+  <div class="panel" id="slicer-panel" style="display:none;">
+    <h2>Recommended Slicer Settings</h2>
+    <table class="slicer-table">
+      <tr><th>Setting</th><th>Value</th></tr>
+      <tr><td>Material</td><td>ABS or PETG (not PLA)</td></tr>
+      <tr><td>Layer Height</td><td>0.20 mm</td></tr>
+      <tr><td>Nozzle</td><td>0.4 mm</td></tr>
+      <tr><td>Infill</td><td>15-20% Grid</td></tr>
+      <tr><td>Walls</td><td>3 perimeters</td></tr>
+      <tr><td>Top / Bottom Layers</td><td>4 / 3</td></tr>
+      <tr><td>Supports</td><td>None</td></tr>
+      <tr><td>Bed Adhesion</td><td>Brim (recommended)</td></tr>
+      <tr><td>Orientation</td><td>Flat (Z-up)</td></tr>
+      <tr><td>ABS Temps</td><td>240-250 / 100-110</td></tr>
+      <tr><td>PETG Temps</td><td>230-240 / 70-80</td></tr>
+    </table>
+  </div>
+</div>
+
+<div class="right-col">
+  <div class="panel" style="padding: 0; overflow: hidden;">
+    <div id="preview-container">
+      <div class="preview-hint">Click Generate to see 3D preview. Drag to rotate, scroll to zoom.</div>
+    </div>
+  </div>
+  <div class="panel panel-list" id="panel-list" style="display:none;">
+    <h2>Panel Details</h2>
+    <div id="panel-details"></div>
+  </div>
+</div>
+</div>
+</div>
+
+<!-- CDN Dependencies -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
+
+<!-- Application Modules (order matters: dependencies first) -->
+<script src="src/constants.js"></script>
+<script src="src/meshData.js"></script>
+<script src="src/geometry.js"></script>
+<script src="src/grid.js"></script>
+<script src="src/panel.js"></script>
+<script src="src/strip.js"></script>
+<script src="src/exportStl.js"></script>
+<script src="src/export3mf.js"></script>
+<script src="src/preview.js"></script>
+<script src="src/ui.js"></script>
+
+</body>
+</html>
