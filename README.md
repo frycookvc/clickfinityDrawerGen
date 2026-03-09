@@ -1,6 +1,6 @@
 # ClickFinity Baseplate Generator
 
-A browser-based tool that generates custom-sized [ClickFinity](https://makerworld.com/en/models/581269)-compatible Gridfinity baseplates. Enter your drawer dimensions, and it outputs print-ready STL/3MF files that tile together to fill the entire space.
+A browser-based tool that generates custom-sized [ClickFinity](https://makerworld.com/en/models/618999-clickfinity-gridfinity-baseplate-no-magnets#profileId-542902)-compatible Gridfinity baseplates. Enter your drawer dimensions, and it outputs print-ready STL/3MF files that tile together to fill the entire space.
 
 ## Usage
 
