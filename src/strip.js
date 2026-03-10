@@ -82,10 +82,11 @@ function generateConnectorStrip(numCells, tabOffset, orientation, fillStart, fil
         const pos = (i - (numCells - 1) / 2) * GRID_PITCH;
         for (const tri of joinerBase) {
             if (isVertical) {
+                // 90° CW rotation: (x,y) → (y, -x) to avoid mirror reflection
                 triangles.push([
-                    [tri[0][1], tri[0][0] + pos, tri[0][2]],
-                    [tri[1][1], tri[1][0] + pos, tri[1][2]],
-                    [tri[2][1], tri[2][0] + pos, tri[2][2]],
+                    [tri[0][1], -tri[0][0] + pos, tri[0][2]],
+                    [tri[1][1], -tri[1][0] + pos, tri[1][2]],
+                    [tri[2][1], -tri[2][0] + pos, tri[2][2]],
                 ]);
             } else {
                 triangles.push([
@@ -104,9 +105,9 @@ function generateConnectorStrip(numCells, tabOffset, orientation, fillStart, fil
         for (const tri of boundaryJoiner) {
             if (isVertical) {
                 triangles.push([
-                    [tri[0][1], tri[0][0] + pos, tri[0][2]],
-                    [tri[1][1], tri[1][0] + pos, tri[1][2]],
-                    [tri[2][1], tri[2][0] + pos, tri[2][2]],
+                    [tri[0][1], -tri[0][0] + pos, tri[0][2]],
+                    [tri[1][1], -tri[1][0] + pos, tri[1][2]],
+                    [tri[2][1], -tri[2][0] + pos, tri[2][2]],
                 ]);
             } else {
                 triangles.push([
@@ -124,9 +125,9 @@ function generateConnectorStrip(numCells, tabOffset, orientation, fillStart, fil
         for (const tri of boundaryJoiner) {
             if (isVertical) {
                 triangles.push([
-                    [tri[0][1], tri[0][0] + pos, tri[0][2]],
-                    [tri[1][1], tri[1][0] + pos, tri[1][2]],
-                    [tri[2][1], tri[2][0] + pos, tri[2][2]],
+                    [tri[0][1], -tri[0][0] + pos, tri[0][2]],
+                    [tri[1][1], -tri[1][0] + pos, tri[1][2]],
+                    [tri[2][1], -tri[2][0] + pos, tri[2][2]],
                 ]);
             } else {
                 triangles.push([
